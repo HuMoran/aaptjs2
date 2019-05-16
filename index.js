@@ -27,12 +27,53 @@ async function aapt(args) {
   }
 }
 
+function list(filePath) {
+  return aapt(['l', filePath]);
+}
+
+function dump(filePath, values) {
+  return aapt(['d', values, filePath]);
+}
+
+function packageCmd(filePath, command) {
+  return aapt(['p', command, filePath]);
+}
+
+function remove(filePath, files) {
+  let tmpFiles = files;
+  if (!Array.isArray(tmpFiles)) {
+    tmpFiles = [tmpFiles];
+  }
+  return aapt(['r', filePath, ...tmpFiles]);
+}
+
+function add(filePath, files) {
+  let tmpFiles = files;
+  if (!Array.isArray(tmpFiles)) {
+    tmpFiles = [tmpFiles];
+  }
+  return aapt(['a', filePath, ...tmpFiles]);
+}
+
+function crunch(resource, outputFolder) {
+  let tmpResource = resource;
+  if (!Array.isArray(tmpResource)) {
+    tmpResource = [tmpResource];
+  }
+  return aapt(['c', '-S', ...tmpResource, '-C', outputFolder]);
+}
+
+function singleCrunch(inputFile, outputfile) {
+  return aapt(['s', '-i', inputFile, '-o', outputfile]);
+}
+
+function version() {
+  return aapt(['v']);
+}
+
 async function getApkInfo(filePath) {
   try {
-    // darwin: macOS linux win32
-    const aapt = `./bin/${process.platform}/aapt_64${process.platform === 'win32' ? '.exe' : ''}`;
-    await access(aapt, fs.constants.X_OK);
-    const { stdout } = await execFile(aapt, ['d', 'badging', filePath]);
+    const stdout = await dump([filePath, 'badging']);
     const match = stdout.match(/name='([^']+)'[\s]*versionCode='(\d+)'[\s]*versionName='([^']+)/);
     const matchName = stdout.match(/application: label='([^']+)'[\s]*icon='([^']+)/);
     const info = {
@@ -51,7 +92,35 @@ async function getApkInfo(filePath) {
   }
 }
 
+async function getApkAndIcon(filePath, outPath) {
+  try {
+    if (!filePath || !outPath) {
+      throw (new Error('Invalid parameter'));
+    }
+    const apkInfo = await getApkInfo(filePath);
+    if (apkInfo.icon) {
+      await execFile('unzip', [filePath, apkInfo.icon, '-d', outPath]);
+      return {
+        ...apkInfo,
+        iconPath: `${outPath}/${apkInfo.icon}`,
+      };
+    }
+  } catch (error) {
+    console.error('aapt error:', error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   aapt,
+  list,
+  dump,
+  packageCmd,
+  remove,
+  add,
+  crunch,
+  singleCrunch,
+  version,
   getApkInfo,
+  getApkAndIcon,
 };
