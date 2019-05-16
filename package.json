@@ -1,6 +1,6 @@
 {
   "name": "aaptjs2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Android Asset Packaging Tool(aapt) for Node.js",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,12 @@
     "type": "git",
     "url": "git+https://github.com/HuMoran/aaptjs.git"
   },
-  "keywords": ["aapt", "aaptjs", "node-aapt", "apktool"],
+  "keywords": [
+    "aapt",
+    "aaptjs",
+    "node-aapt",
+    "apktool"
+  ],
   "author": "Tao.Hu",
   "license": "MIT",
   "bugs": {
