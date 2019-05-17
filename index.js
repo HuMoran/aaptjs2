@@ -12,6 +12,7 @@
 const fs = require('fs');
 const util = require('util');
 const access = util.promisify(fs.access);
+const chmod = util.promisify(fs.chmod);
 const execFile = util.promisify(require('child_process').execFile);
 
 async function aapt(args) {
@@ -19,6 +20,9 @@ async function aapt(args) {
     // darwin: macOS linux win32
     const aapt = `./bin/${process.platform}/aapt_64${process.platform === 'win32' ? '.exe' : ''}`;
     await access(aapt, fs.constants.X_OK);
+    if (process.platform === 'linux' || process.platform === 'darwin') {
+      await chmod(aapt, '755');
+    }
     const { stdout } = await execFile(aapt, args);
     return stdout;
   } catch (error) {
