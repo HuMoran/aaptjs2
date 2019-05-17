@@ -1,6 +1,6 @@
 {
   "name": "aaptjs2",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Android Asset Packaging Tool(aapt) for Node.js",
   "main": "index.js",
   "scripts": {
