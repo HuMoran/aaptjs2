@@ -21,5 +21,6 @@
   "bugs": {
     "url": "https://github.com/HuMoran/aaptjs/issues"
   },
-  "homepage": "https://github.com/HuMoran/aaptjs#readme"
+  "homepage": "https://github.com/HuMoran/aaptjs#readme",
+  "dependencies": {}
 }

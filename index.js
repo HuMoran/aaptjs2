@@ -11,15 +11,18 @@
 'use strict';
 const fs = require('fs');
 const util = require('util');
+const path = require('path');
 const access = util.promisify(fs.access);
 const chmod = util.promisify(fs.chmod);
+const writeFile = util.promisify(fs.writeFile);
+const mkdir = util.promisify(fs.mkdir);
 const execFile = util.promisify(require('child_process').execFile);
 
 async function aapt(args) {
   try {
     // darwin: macOS linux win32
-    const aapt = `./bin/${process.platform}/aapt_64${process.platform === 'win32' ? '.exe' : ''}`;
-    await access(aapt, fs.constants.X_OK);
+    const aapt = path.join(__dirname, 'bin', process.platform, `aapt_64${process.platform === 'win32' ? '.exe' : ''}`);
+    await access(aapt, fs.constants.F_OK);
     if (process.platform === 'linux' || process.platform === 'darwin') {
       await chmod(aapt, '755');
     }
@@ -67,8 +70,8 @@ function crunch(resource, outputFolder) {
   return aapt(['c', '-S', ...tmpResource, '-C', outputFolder]);
 }
 
-function singleCrunch(inputFile, outputfile) {
-  return aapt(['s', '-i', inputFile, '-o', outputfile]);
+function singleCrunch(inputFile, outputFile) {
+  return aapt(['s', '-i', inputFile, '-o', outputFile]);
 }
 
 function version() {
@@ -77,7 +80,7 @@ function version() {
 
 async function getApkInfo(filePath) {
   try {
-    const stdout = await dump([filePath, 'badging']);
+    const stdout = await dump(filePath, 'badging');
     const match = stdout.match(/name='([^']+)'[\s]*versionCode='(\d+)'[\s]*versionName='([^']+)/);
     const matchName = stdout.match(/application: label='([^']+)'[\s]*icon='([^']+)/);
     const info = {
@@ -96,17 +99,19 @@ async function getApkInfo(filePath) {
   }
 }
 
-async function getApkAndIcon(filePath, outPath) {
+async function getApkAndIcon(filePath, outIconName, outIconPath = './') {
   try {
-    if (!filePath || !outPath) {
+    if (!filePath || !outIconName) {
       throw (new Error('Invalid parameter'));
     }
     const apkInfo = await getApkInfo(filePath);
     if (apkInfo.icon) {
-      await execFile('unzip', [filePath, apkInfo.icon, '-d', outPath]);
+      const { stdout } = await execFile('unzip', ['-p', filePath, apkInfo.icon], { encoding: 'buffer' });
+      await mkdir(outIconPath, { recursive: true });
+      await writeFile(`${outIconPath}/${outIconName}`, stdout);
       return {
         ...apkInfo,
-        iconPath: `${outPath}/${apkInfo.icon}`,
+        iconPath: `${outIconPath}/${outIconName}`,
       };
     }
   } catch (error) {
