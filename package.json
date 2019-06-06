@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HuMoran/aaptjs.git"
+    "url": "git+https://github.com/HuMoran/aaptjs2.git"
   },
   "keywords": [
     "aapt",
@@ -19,8 +19,8 @@
   "author": "Tao.Hu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/HuMoran/aaptjs/issues"
+    "url": "https://github.com/HuMoran/aaptjs2/issues"
   },
-  "homepage": "https://github.com/HuMoran/aaptjs#readme",
+  "homepage": "https://github.com/HuMoran/aaptjs2#readme",
   "dependencies": {}
 }
