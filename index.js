@@ -26,7 +26,7 @@ async function aapt(args) {
     if (process.platform === 'linux' || process.platform === 'darwin') {
       await chmod(aapt, '755');
     }
-    const { stdout } = await execFile(aapt, args);
+    const { stdout } = await execFile(aapt, args, { maxBuffer: 10000 * 1024 });
     return stdout;
   } catch (error) {
     console.error('aapt error:', error.message);
